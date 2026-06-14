@@ -1,0 +1,55 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Analyze issue with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowed-tools Bash(gh issue *)'
+          prompt: |
+            Analyze this GitHub issue for the Tetris project (vanilla JS/HTML5/CSS3, no frameworks):
+
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+            Issue number: ${{ github.event.issue.number }}
+
+            Do the following:
+
+            1. **Assign labels** using `gh issue edit ${{ github.event.issue.number }} --add-label "<label>"`.
+               Choose only from these labels (create with `gh label create` if missing):
+               - `bug` — something broken or incorrect behavior
+               - `enhancement` — improvement to existing feature
+               - `feature` — new functionality request
+               - `gameplay` — affects game mechanics (movement, scoring, levels, collision)
+               - `ui` — visual/rendering/canvas issues
+               - `performance` — lag, frame rate, or efficiency concerns
+               - `documentation` — docs or code comments
+               - `question` — unclear request or needs more info
+               Apply all that fit. Minimum 1, maximum 3.
+
+            2. **Post a diagnosis comment** using `gh issue comment ${{ github.event.issue.number }} --body "<comment>"`.
+               The comment must contain:
+               - **Summary**: one sentence restating the problem
+               - **Root cause hypothesis**: where in the codebase this likely lives (reference specific files/functions if possible — main files are `game.js`, `index.html`, `style.css`)
+               - **Affected area**: what game systems are impacted
+               - **Implementation hint**: concrete starting point for fixing or implementing (specific function, variable, or section to modify)
+               - **Complexity estimate**: Low / Medium / High with a one-line reason
+
+               Keep the comment technical and concise. No filler. Format as markdown.
