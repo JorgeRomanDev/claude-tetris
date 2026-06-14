@@ -169,7 +169,7 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -300,5 +300,16 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('click', () => {
+  const isLight = document.documentElement.dataset.theme === 'light';
+  document.documentElement.dataset.theme = isLight ? 'dark' : 'light';
+  themeToggle.textContent = isLight ? '🌙 Modo oscuro' : '☀️ Modo claro';
+  if (paused || gameOver) {
+    draw();
+    drawNext();
+  }
+});
 
 init();
