@@ -45,6 +45,7 @@ jobs:
                Apply all that fit. Minimum 1, maximum 3.
 
             2. **Post a diagnosis comment** using `gh issue comment ${{ github.event.issue.number }} --body "<comment>"`.
+               The comment body must be written in valid GitHub-flavored Markdown so GitHub renders it correctly (use `**bold**`, `-` lists, `` `code` ``, and `##` headings).
                The comment must contain:
                - **Summary**: one sentence restating the problem
                - **Root cause hypothesis**: where in the codebase this likely lives (reference specific files/functions if possible — main files are `game.js`, `index.html`, `style.css`)
